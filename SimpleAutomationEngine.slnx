@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SimpleAutomationEngine.Api/SimpleAutomationEngine.Api.csproj" />
+    <Project Path="src/SimpleAutomationEngine.Application/SimpleAutomationEngine.Application.csproj" />
+    <Project Path="src/SimpleAutomationEngine.Domain/SimpleAutomationEngine.Domain.csproj" />
+    <Project Path="src/SimpleAutomationEngine.Infrastructure/SimpleAutomationEngine.Infrastructure.csproj" />
+  </Folder>
+</Solution>
