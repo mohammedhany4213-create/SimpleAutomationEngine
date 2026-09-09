@@ -3,7 +3,7 @@ using SimpleAutomationEngine.Domain.Enums;
 
 namespace SimpleAutomationEngine.Application.DTOs;
 
-public class CreateActionTaskDto
+public class UpdateActionTaskDto
 {
     [Required(ErrorMessage = "The type is required.")]
     public ActionType Type { get; set; }
