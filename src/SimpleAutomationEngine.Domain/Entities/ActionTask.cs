@@ -5,10 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleAutomationEngine.Domain.Entities
 {
-    public class Action
+    public class ActionTask
     {
         [Key]
-        public int ActionId {get; set;}
+        public int ActionTaskId {get; set;}
 
         public int UserId {get; set;}
 

@@ -25,6 +25,6 @@ namespace SimpleAutomationEngine.Domain.Entities
         public string? RefreshToken {get; set;}  
         public DateTime? RefreshTokenExpirationTime {get; set;}  
 
-        public ICollection<Action> Actions {get; set;} = new List<Action>();
+        public ICollection<ActionTask> ActionTasks {get; set;} = new List<ActionTask>();
     }
 } 

@@ -8,7 +8,7 @@ namespace SimpleAutomationEngine.Domain.Entities
     {
         [Key]
         public int ActionLogId {get; set;}
-        public int ActionId {get; set;}
+        public int ActionTaskId {get; set;}
 
         public ActionStatus OldStatus {get; set;}
 
@@ -18,7 +18,7 @@ namespace SimpleAutomationEngine.Domain.Entities
 
         public DateTime Timestamp {get; set;} = DateTime.UtcNow ;
 
-        [ForeignKey(nameof(ActionId))]
-        public Action Action {get; set;}= null! ;
+        [ForeignKey(nameof(ActionTaskId))]
+        public ActionTask ActionTask {get; set;}= null! ;
     }
 }
