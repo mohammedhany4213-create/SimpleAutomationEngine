@@ -1,35 +1,32 @@
-using System.ComponentModel.DataAnnotations ;
-using SimpleAutomationEngine.Domain.Enums ;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using SimpleAutomationEngine.Domain.Enums;
 
+namespace SimpleAutomationEngine.Domain.Entities;
 
-namespace SimpleAutomationEngine.Domain.Entities
+public class ActionTask
 {
-    public class ActionTask
-    {
-        [Key]
-        public int ActionTaskId {get; set;}
+    [Key]
+    public int ActionTaskId { get; set; }
 
-        public int UserId {get; set;}
+    public int UserId { get; set; }
 
-        [Required]
-        [MaxLength(500)]
-        public string Content {get; set;} = string.Empty ;
+    [Required]
+    [MaxLength(500)]
+    public string Content { get; set; } = string.Empty;
 
-        [Required]
-        public ActionType Type {get; set;}
+    [Required]
+    public ActionType Type { get; set; }
 
-        public ActionStatus Status {get; set;}
+    public ActionStatus Status { get; set; }
 
-        [Required]
-        public DateTime ExecusionTime {get; set;}
+    [Required]
+    public DateTime ExecutionTime { get; set; }
 
-        public DateTime CreatedAt {get; set;} = DateTime.UtcNow ;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [ForeignKey(nameof(UserId))]
-        public User User { get; set; } = null!;
+    [ForeignKey(nameof(UserId))]
+    public User User { get; set; } = null!;
 
-        public ICollection<ActionLog> ActionLogs {get; set;} = new List<ActionLog>();
-
-    }
+    public ICollection<ActionLog> ActionLogs { get; set; } = new List<ActionLog>();
 }
