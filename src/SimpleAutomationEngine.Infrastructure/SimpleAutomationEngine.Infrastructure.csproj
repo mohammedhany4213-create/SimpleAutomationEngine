@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\SimpleAutomationEngine.Application\SimpleAutomationEngine.Application.csproj" />
     <ProjectReference Include="..\SimpleAutomationEngine.Domain\SimpleAutomationEngine.Domain.csproj" />
   </ItemGroup>
 
