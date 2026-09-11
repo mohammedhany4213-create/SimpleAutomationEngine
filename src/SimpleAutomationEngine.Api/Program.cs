@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleAutomationEngine.Infrastructure.Data ;
+using SimpleAutomationEngine.Infrastructure.Repositories;
+using SimpleAutomationEngine.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(connectionString)
 );
+
+builder.Services.AddScoped<IActionTaskRepository , ActionTaskRepository>();
 
 builder.Services.AddControllers();
 
