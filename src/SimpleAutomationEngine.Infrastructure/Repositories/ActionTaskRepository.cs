@@ -9,7 +9,7 @@ public class ActionTaskRepository : IActionTaskRepository
 {
     private readonly AppDbContext _context ;
 
-    ActionTaskRepository(AppDbContext context)
+    public ActionTaskRepository(AppDbContext context)
     {
         _context = context ;
     }

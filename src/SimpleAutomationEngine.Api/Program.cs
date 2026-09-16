@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleAutomationEngine.Infrastructure.Data ;
 using SimpleAutomationEngine.Infrastructure.Repositories;
 using SimpleAutomationEngine.Application.Interfaces;
+using SimpleAutomationEngine.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<AppDbContext>(
 );
 
 builder.Services.AddScoped<IActionTaskRepository , ActionTaskRepository>();
+builder.Services.AddScoped<IActionTaskService , ActionTaskService>();
 
 builder.Services.AddControllers();
 

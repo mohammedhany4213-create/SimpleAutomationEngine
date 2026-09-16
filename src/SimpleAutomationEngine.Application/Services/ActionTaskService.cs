@@ -8,7 +8,7 @@ namespace SimpleAutomationEngine.Application.Services;
 public class ActionTaskService : IActionTaskService
 {
     private readonly IActionTaskRepository _repository ;
-    ActionTaskService(IActionTaskRepository repository)
+    public ActionTaskService(IActionTaskRepository repository)
     {
         _repository = repository ;
     }
