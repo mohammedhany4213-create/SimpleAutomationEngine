@@ -6,9 +6,7 @@ namespace SimpleAutomationEngine.Domain.Entities
     {
         [Key]
         public int UserId {get; set;}
-
         
-
         [Required]
         [MaxLength(100)]
         public string FullName {get; set;} = string.Empty ;

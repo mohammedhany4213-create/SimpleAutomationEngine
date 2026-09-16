@@ -3,6 +3,7 @@ using SimpleAutomationEngine.Infrastructure.Data ;
 using SimpleAutomationEngine.Infrastructure.Repositories;
 using SimpleAutomationEngine.Application.Interfaces;
 using SimpleAutomationEngine.Application.Services;
+using SimpleAutomationEngine.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(
 
 builder.Services.AddScoped<IActionTaskRepository , ActionTaskRepository>();
 builder.Services.AddScoped<IActionTaskService , ActionTaskService>();
+builder.Services.AddScoped<IPasswordHasher , PasswordHasher>();
 
 builder.Services.AddControllers();
 
