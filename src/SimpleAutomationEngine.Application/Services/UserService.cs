@@ -8,11 +8,13 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _repository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly ITokenGenerator _tokenGenerator;
 
-    public UserService(IUserRepository repository, IPasswordHasher passwordHasher)
+    public UserService(IUserRepository repository, IPasswordHasher passwordHasher, ITokenGenerator tokenGenerator)
     {
         _repository = repository;
         _passwordHasher = passwordHasher;
+        _tokenGenerator = tokenGenerator;
     }
 
     public async Task<UserResponseDto> RegisterAsync(CreateUserDto dto, string password)
@@ -36,6 +38,26 @@ public class UserService : IUserService
             FullName = created.FullName,
             Email = created.Email,
             CreatedAt = created.CreatedAt
+        };
+    }
+
+    public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
+    {
+        var user = await _repository.GetByEmailAsync(dto.Email);
+        if (user is null || !_passwordHasher.Verify(dto.Password, user.PasswordHash))
+            throw new UnauthorizedAccessException("Invalid email or password.");
+
+        var accessToken = _tokenGenerator.GenerateAccessToken(user);
+        var refreshToken = _tokenGenerator.GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpirationTime = DateTime.UtcNow.AddDays(7);
+        await _repository.UpdateAsync(user);
+
+        return new AuthResponseDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
         };
     }
 }
