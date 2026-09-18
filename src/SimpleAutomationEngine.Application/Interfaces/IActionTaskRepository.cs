@@ -9,5 +9,6 @@ public interface IActionTaskRepository
     Task<List<ActionTask>> GetAllAsync();
     Task UpdateAsync(ActionTask task);
     Task DeleteAsync(ActionTask task);
+    Task<List<ActionTask>> GetAllByUserIdAsync(int userId);
     
 }

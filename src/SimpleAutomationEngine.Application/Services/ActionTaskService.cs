@@ -27,20 +27,21 @@ public class ActionTaskService : IActionTaskService
     }
 
 
-    public async Task<ActionTaskResponseDto> CreateActionTaskAsync(CreateActionTaskDto dto)
+    public async Task<ActionTaskResponseDto> CreateActionTaskAsync(CreateActionTaskDto dto, int userId)
+{
+    var task = new ActionTask
     {
-        var task = new ActionTask
-        {
-            Type = dto.Type ,
-            Content = dto.Content ,
-            ExecutionTime = dto.ExecutionTime ,
-            Status = ActionStatus.Pending 
-        };
+        Type = dto.Type,
+        Content = dto.Content,
+        ExecutionTime = dto.ExecutionTime,
+        Status = ActionStatus.Pending,
+        UserId = userId
+    };
 
-        var created = await _repository.AddAsync(task);
-        return MapToResponseDto(created);
+    var created = await _repository.AddAsync(task);
+    return MapToResponseDto(created);
+}
 
-    }
 
     public async Task DeleteActionTaskAsync(int id)
     {
@@ -55,23 +56,20 @@ public class ActionTaskService : IActionTaskService
     }
 
 
-    public async Task<ActionTaskResponseDto> GetActionTaskByIdAsync(int id)
-    {
-        var task = await _repository.GetByIdAsync(id);
-        if(task is null)
-            throw new KeyNotFoundException($"Action task with id {id} was not found. ");
-        else
-        return MapToResponseDto(task);
-    }
+    public async Task<ActionTaskResponseDto?> GetByIdAsync(int id, int userId)
+{
+    var task = await _repository.GetByIdAsync(id);
+    if (task is null || task.UserId != userId)
+        return null;
 
-    public async Task<List<ActionTaskResponseDto>> GetActionTasksAsync()
-    {
-        List<ActionTask>tasks = await _repository.GetAllAsync();
-        return tasks.Select(MapToResponseDto).ToList();
+    return MapToResponseDto(task);
+}
 
-
-    }
-
+public async Task<List<ActionTaskResponseDto>> GetAllAsync(int userId)
+{
+    var tasks = await _repository.GetAllByUserIdAsync(userId);
+    return tasks.Select(MapToResponseDto).ToList();
+}
     public async Task<ActionTaskResponseDto> UpdateActionTaskAsync(int id, UpdateActionTaskDto dto)
     {
         var task = await _repository.GetByIdAsync(id);

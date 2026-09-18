@@ -13,6 +13,13 @@ public class ActionTaskRepository : IActionTaskRepository
     {
         _context = context ;
     }
+
+    public async Task<List<ActionTask>> GetAllByUserIdAsync(int userId)
+{
+    return await _context.Actions
+        .Where(t => t.UserId == userId)
+        .ToListAsync();
+}
     public async Task<ActionTask> AddAsync(ActionTask task)
     {
         _context.Actions.Add(task);

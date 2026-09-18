@@ -4,11 +4,11 @@ namespace SimpleAutomationEngine.Application.Interfaces;
 
 public interface IActionTaskService
 {
-    Task<ActionTaskResponseDto> CreateActionTaskAsync(CreateActionTaskDto dto);
+    Task<ActionTaskResponseDto> CreateActionTaskAsync(CreateActionTaskDto dto, int userId);
 
-    Task<List<ActionTaskResponseDto>> GetActionTasksAsync();
+    Task<List<ActionTaskResponseDto>> GetAllAsync(int userId);
 
-    Task<ActionTaskResponseDto> GetActionTaskByIdAsync(int id);
+    Task<ActionTaskResponseDto?> GetByIdAsync(int id, int userId);
 
     Task<ActionTaskResponseDto> UpdateActionTaskAsync(
         int id,
