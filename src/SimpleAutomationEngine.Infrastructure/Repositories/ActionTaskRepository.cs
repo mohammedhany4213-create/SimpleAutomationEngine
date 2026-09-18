@@ -63,4 +63,17 @@ public async Task<List<ActionTask>> GetDueTasksAsync(DateTime now)
         .Where(t => t.Status == ActionStatus.Pending && t.ExecutionTime <= now)
         .ToListAsync();
 }
+
+public async Task<List<ActionTask>> GetStaleProcessingTasksAsync(DateTime staleBefore)
+{
+    return await _context.Actions
+        .Where(t => t.Status == ActionStatus.Processing)
+        .Where(t => t.ActionLogs
+            .Where(l => l.NewStatus == ActionStatus.Processing)
+            .OrderByDescending(l => l.Timestamp)
+            .Select(l => l.Timestamp)
+            .FirstOrDefault() <= staleBefore)
+        .ToListAsync();
+}
+
 }

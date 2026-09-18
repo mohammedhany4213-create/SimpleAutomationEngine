@@ -33,8 +33,7 @@ public class ActionTaskExecutionJob
 
     private async Task ProcessTaskAsync(ActionTask task)
     {
-        // نحوّل الحالة لـ Processing ونحفظها فورًا الأول، عشان لو Job instance
-        // تاني اشتغل في نفس اللحظة، مايلقاش التاسك ده Pending تاني (راجع نقطة الـ concurrency اللي اتكلمنا فيها)
+        
         var oldStatus = task.Status;
         task.Status = ActionStatus.Processing;
         await _repository.UpdateAsync(task);
@@ -77,4 +76,27 @@ public class ActionTaskExecutionJob
             });
         }
     }
+    public async Task RecoverStaleTasksAsync()
+{
+    var staleThreshold = DateTime.UtcNow.AddMinutes(-5);
+    var staleTasks = await _repository.GetStaleProcessingTasksAsync(staleThreshold);
+
+    foreach (var task in staleTasks)
+    {
+        _logger.LogWarning(
+            "Task {TaskId} was stuck in Processing, reverting to Pending for retry.",
+            task.ActionTaskId);
+
+        var oldStatus = task.Status;
+        task.Status = ActionStatus.Pending;
+        await _repository.UpdateAsync(task);
+        await _repository.AddLogAsync(new ActionLog
+        {
+            ActionTaskId = task.ActionTaskId,
+            OldStatus = oldStatus,
+            NewStatus = task.Status,
+            Notes = "Recovered from a stale Processing state (likely a previous crash)."
+        });
+    }
+}
 }

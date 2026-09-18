@@ -14,5 +14,6 @@ public interface IActionTaskRepository
     Task AddLogAsync(ActionLog log);
 
     Task<List<ActionTask>> GetDueTasksAsync(DateTime now);
+    Task<List<ActionTask>> GetStaleProcessingTasksAsync(DateTime staleBefore);
     
 }
