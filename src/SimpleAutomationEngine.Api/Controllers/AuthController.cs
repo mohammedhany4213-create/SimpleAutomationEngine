@@ -48,4 +48,18 @@ public async Task<IActionResult> Login(LoginDto dto)
         return Unauthorized(new { message = ex.Message });
     }
 }
+
+[HttpPost("refresh")]
+public async Task<IActionResult> Refresh(RefreshTokenDto dto)
+{
+    try
+    {
+        var result = await _userService.RefreshTokenAsync(dto);
+        return Ok(result);
+    }
+    catch (UnauthorizedAccessException ex)
+    {
+        return Unauthorized(new { message = ex.Message });
+    }
+}
 }

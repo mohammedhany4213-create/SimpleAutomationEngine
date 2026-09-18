@@ -60,4 +60,29 @@ public class UserService : IUserService
             RefreshToken = refreshToken
         };
     }
+
+    public async Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenDto dto)
+{
+    var user = await _repository.GetByRefreshTokenAsync(dto.RefreshToken);
+
+    if (user is null
+        || user.RefreshTokenExpirationTime is null
+        || user.RefreshTokenExpirationTime <= DateTime.UtcNow)
+    {
+        throw new UnauthorizedAccessException("Invalid or expired refresh token.");
+    }
+
+    var newAccessToken = _tokenGenerator.GenerateAccessToken(user);
+    var newRefreshToken = _tokenGenerator.GenerateRefreshToken();
+
+    user.RefreshToken = newRefreshToken;
+    user.RefreshTokenExpirationTime = DateTime.UtcNow.AddDays(7);
+    await _repository.UpdateAsync(user);
+
+    return new AuthResponseDto
+    {
+        AccessToken = newAccessToken,
+        RefreshToken = newRefreshToken
+    };
+}
 }

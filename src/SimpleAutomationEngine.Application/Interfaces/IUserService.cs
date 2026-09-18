@@ -6,4 +6,5 @@ public interface IUserService
 {
     Task<UserResponseDto> RegisterAsync(CreateUserDto dto, string password);
     Task<AuthResponseDto> LoginAsync(LoginDto dto);
+    Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenDto dto);
 }
