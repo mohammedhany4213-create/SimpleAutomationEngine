@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleAutomationEngine.Application.Interfaces;
 using SimpleAutomationEngine.Domain.Entities;
 using SimpleAutomationEngine.Infrastructure.Data;
+using SimpleAutomationEngine.Domain.Enums;
 
 namespace SimpleAutomationEngine.Infrastructure.Repositories;
 
@@ -49,4 +50,17 @@ public class ActionTaskRepository : IActionTaskRepository
         _context.Actions.Update(task);
         await _context.SaveChangesAsync();
     }
+
+    public async Task AddLogAsync(ActionLog log)
+{
+    _context.ActionLogs.Add(log);
+    await _context.SaveChangesAsync();
+}
+
+public async Task<List<ActionTask>> GetDueTasksAsync(DateTime now)
+{
+    return await _context.Actions
+        .Where(t => t.Status == ActionStatus.Pending && t.ExecutionTime <= now)
+        .ToListAsync();
+}
 }
