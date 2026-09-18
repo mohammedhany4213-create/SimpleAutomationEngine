@@ -44,35 +44,56 @@ public async Task<IActionResult> Create(CreateActionTaskDto dto)
 {
     var userId = GetCurrentUserId();
     var result = await _service.CreateActionTaskAsync(dto, userId);
-    return CreatedAtAction(nameof(GetById), new { id = result.UserId }, result);
+    return CreatedAtAction(nameof(GetById), new { id = result.ActionTaskId }, result);
 }
 
     [HttpPut("{id}")]
-    public async Task <IActionResult> Update(int id , UpdateActionTaskDto dto)
+public async Task<IActionResult> Update(int id, UpdateActionTaskDto dto)
+{
+    var userId = GetCurrentUserId();
+    try
     {
-        try
-        {
-            var result = await _service.UpdateActionTaskAsync(id , dto);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
+        var result = await _service.UpdateActionTaskAsync(id, dto, userId);
+        return Ok(result);
     }
+    catch (KeyNotFoundException)
+    {
+        return NotFound();
+    }
+}
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+[HttpDelete("{id}")]
+public async Task<IActionResult> Delete(int id)
+{
+    var userId = GetCurrentUserId();
+    try
     {
-        try
-        {
-            await _service.DeleteActionTaskAsync(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
+        await _service.DeleteActionTaskAsync(id, userId);
+        return NoContent();
     }
+    catch (KeyNotFoundException)
+    {
+        return NotFound();
+    }
+}
+
+[HttpPatch("{id}/cancel")]
+public async Task<IActionResult> Cancel(int id)
+{
+    var userId = GetCurrentUserId();
+    try
+    {
+        var result = await _service.CancelActionTaskAsync(id, userId);
+        return Ok(result);
+    }
+    catch (KeyNotFoundException)
+    {
+        return NotFound();
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Conflict(new { message = ex.Message });
+    }
+}
 
 }
