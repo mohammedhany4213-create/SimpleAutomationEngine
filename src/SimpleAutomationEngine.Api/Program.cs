@@ -10,6 +10,9 @@ using Microsoft.OpenApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Hangfire ;
+using SimpleAutomationEngine.Infrastructure.Execution;
+using SimpleAutomationEngine.Application.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +22,20 @@ builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(connectionString)
 );
 
+builder.Services.AddHangfire(config => config
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(connectionString));
+
+builder.Services.AddHangfireServer();
+
 builder.Services.AddScoped<IActionTaskRepository, ActionTaskRepository>();
 builder.Services.AddScoped<IActionTaskService, ActionTaskService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IActionExecutor, ActionExecutor>();
+builder.Services.AddScoped<ActionTaskExecutionJob>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()!;
@@ -80,6 +93,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHangfireDashboard("/hangfire");
+RecurringJob.AddOrUpdate<ActionTaskExecutionJob>(
+    "execute-due-action-tasks",
+    job => job.RunAsync(),
+    "* * * * *");
 
 app.UseHttpsRedirection();
 
