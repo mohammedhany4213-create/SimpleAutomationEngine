@@ -13,6 +13,7 @@ using System.Text;
 using Hangfire ;
 using SimpleAutomationEngine.Infrastructure.Execution;
 using SimpleAutomationEngine.Application.Jobs;
+using Hangfire.Dashboard;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,16 +95,26 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHangfireDashboard("/hangfire");
-RecurringJob.AddOrUpdate<ActionTaskExecutionJob>(
-    "execute-due-action-tasks",
-    job => job.RunAsync(),
-    "* * * * *");
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireDashboardAuthFilter() }
+});
+RecurringJob.AddOrUpdate<ActionTaskExecutionJob>(
+    "execute-due-action-tasks",
+    job => job.RunAsync(),
+    "* * * * *");
+    
+    RecurringJob.AddOrUpdate<ActionTaskExecutionJob>(
+    "recover-stale-processing-tasks",
+    job => job.RecoverStaleTasksAsync(),
+    "*/5 * * * *");
+
 
 app.MapControllers();
 
