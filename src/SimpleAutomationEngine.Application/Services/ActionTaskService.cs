@@ -43,17 +43,14 @@ public class ActionTaskService : IActionTaskService
 }
 
 
-    public async Task DeleteActionTaskAsync(int id)
-    {
-        var task = await _repository.GetByIdAsync(id);
+    public async Task DeleteActionTaskAsync(int id, int userId)
+{
+    var task = await _repository.GetByIdAsync(id);
+    if (task is null || task.UserId != userId)
+        throw new KeyNotFoundException($"Action task with id {id} was not found.");
 
-        if (task is null)
-            throw new KeyNotFoundException($"Action task with id {id} was not found.");
-        
-        else
-        await _repository.DeleteAsync(task);
-
-    }
+    await _repository.DeleteAsync(task);
+}
 
 
     public async Task<ActionTaskResponseDto?> GetByIdAsync(int id, int userId)
@@ -70,18 +67,41 @@ public async Task<List<ActionTaskResponseDto>> GetAllAsync(int userId)
     var tasks = await _repository.GetAllByUserIdAsync(userId);
     return tasks.Select(MapToResponseDto).ToList();
 }
-    public async Task<ActionTaskResponseDto> UpdateActionTaskAsync(int id, UpdateActionTaskDto dto)
+    public async Task<ActionTaskResponseDto> UpdateActionTaskAsync(int id, UpdateActionTaskDto dto, int userId)
+{
+    var task = await _repository.GetByIdAsync(id);
+    if (task is null || task.UserId != userId)
+        throw new KeyNotFoundException($"Action task with id {id} was not found.");
+
+    task.Type = dto.Type;
+    task.Content = dto.Content;
+    task.ExecutionTime = dto.ExecutionTime;
+
+    await _repository.UpdateAsync(task);
+    return MapToResponseDto(task);
+}
+
+public async Task<ActionTaskResponseDto> CancelActionTaskAsync(int id, int userId)
+{
+    var task = await _repository.GetByIdAsync(id);
+    if (task is null || task.UserId != userId)
+        throw new KeyNotFoundException($"Action task with id {id} was not found.");
+
+    if (task.Status != ActionStatus.Pending)
+        throw new InvalidOperationException($"Cannot cancel a task with status '{task.Status}'.");
+
+    var oldStatus = task.Status;
+    task.Status = ActionStatus.Canceled;
+    await _repository.UpdateAsync(task);
+
+    await _repository.AddLogAsync(new ActionLog
     {
-        var task = await _repository.GetByIdAsync(id);
-        if (task is null)
-            throw new KeyNotFoundException($"Action task with id {id} was not found.");
-        task.Type = dto.Type;
-        task.Content = dto.Content ;
-        task.ExecutionTime = dto.ExecutionTime;
+        ActionTaskId = task.ActionTaskId,
+        OldStatus = oldStatus,
+        NewStatus = task.Status,
+        Notes = "Canceled by user."
+    });
 
-        await _repository.UpdateAsync(task);
-
-        return MapToResponseDto(task);
-        
-    }
+    return MapToResponseDto(task);
+}
 }
